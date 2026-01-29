@@ -1,3 +1,4 @@
+
 import Combine
 import Foundation
 
@@ -10,7 +11,7 @@ enum ArtAppsNetworkError: Error {
 
 struct ArtAppsAdResponse: Codable {
     let requestId: String? // Changed to optional
-    let finalUrl: String
+    let finalUrl: String?  // Changed to optional (can be missing if allow=false)
     let ttl: Int
     let allow: Bool
     let cooldownSec: Int?
