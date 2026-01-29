@@ -53,7 +53,7 @@ public class ArtAppsInterstitial: NSObject {
                         ttlSeconds: response.ttl
                     )
                     
-                    if response.allow {
+                    if response.allow == true {
                         self.adResponse = response
                         
                         self.isReady = true
