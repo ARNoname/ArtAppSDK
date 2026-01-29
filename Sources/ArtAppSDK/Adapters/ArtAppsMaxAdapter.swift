@@ -23,8 +23,10 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
         let serverParameters = parameters.serverParameters
         
         // Extract IDs from serverParameters (configured in MAX dashboard)
-        let partnerId = serverParameters["partner_id"] as? String ?? ""
-        let appId = serverParameters["app_id"] as? String ?? ""
+        // Extract IDs from serverParameters (configured in MAX dashboard)
+        // Fallback to test credentials if missing
+        let partnerId = (serverParameters["partner_id"] as? String) ?? "test_partner"
+        let appId = (serverParameters["app_id"] as? String) ?? "test_app"
         
         let params = UncheckedSendable(value: (partnerId, appId, completionHandler))
         
