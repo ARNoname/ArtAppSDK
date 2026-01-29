@@ -83,6 +83,10 @@ class ArtAppsNetworkManager {
                     return
                 }
                 
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("[ArtApps] Raw Server Response: \(jsonString)")
+                }
+                
                 let adResponse = try JSONDecoder().decode(ArtAppsAdResponse.self, from: data)
                 
                 completion(.success(adResponse))
