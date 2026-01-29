@@ -9,7 +9,7 @@ enum ArtAppsNetworkError: Error {
 }
 
 struct ArtAppsAdResponse: Codable {
-    let requestId: String
+    let requestId: String? // Changed to optional
     let finalUrl: String
     let ttl: Int
     let allow: Bool
