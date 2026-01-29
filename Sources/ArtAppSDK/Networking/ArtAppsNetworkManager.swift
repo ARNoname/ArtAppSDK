@@ -12,7 +12,7 @@ enum ArtAppsNetworkError: Error {
 struct ArtAppsAdResponse: Codable {
     let requestId: String? // Changed to optional
     let finalUrl: String?  // Changed to optional (can be missing if allow=false)
-    let ttl: Int
+    let ttl: Int? // Changed to optional (can be missing if allow=false)
     let allow: Bool
     let cooldownSec: Int?
     let sessionGate: Int?
