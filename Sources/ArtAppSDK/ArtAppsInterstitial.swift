@@ -35,11 +35,11 @@ public class ArtAppsInterstitial: NSObject {
         
         // Check Pilot Rules (Session Gate / Frequency Cap)
         // MOVED TO SHOW()
-//        if !ArtApps.shared.canShowAd() {
-//            let error = NSError(domain: "com.artApps.sdk", code: 205, userInfo: [NSLocalizedDescriptionKey: "Frequency/Session Cap"])
-//            delegate?.artAppsInterstitial(self, didFailToLoad: error)
-//            return
-//        }
+        if !ArtApps.shared.canShowAd() {
+            let error = NSError(domain: "com.artApps.sdk", code: 205, userInfo: [NSLocalizedDescriptionKey: "Frequency/Session Cap"])
+            delegate?.artAppsInterstitial(self, didFailToLoad: error)
+            return
+        }
         
         isReady = false
         
