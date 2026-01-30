@@ -34,11 +34,11 @@ public class ArtAppsInterstitial: NSObject {
         }
         
         // Check Pilot Rules (Session Gate / Frequency Cap)
-        if !ArtApps.shared.canShowAd() {
-            let error = NSError(domain: "com.artApps.sdk", code: 205, userInfo: [NSLocalizedDescriptionKey: "Frequency/Session Cap"])
-            delegate?.artAppsInterstitial(self, didFailToLoad: error)
-            return
-        }
+//        if !ArtApps.shared.canShowAd() {
+//            let error = NSError(domain: "com.artApps.sdk", code: 205, userInfo: [NSLocalizedDescriptionKey: "Frequency/Session Cap"])
+//            delegate?.artAppsInterstitial(self, didFailToLoad: error)
+//            return
+//        }
         
         isReady = false
         
@@ -60,6 +60,7 @@ public class ArtAppsInterstitial: NSObject {
                         self.isReady = true
                         print("[ArtApps] Interstitial loaded for placement: \(self.placementId)")
                         self.delegate?.artAppsInterstitialDidLoad(self)
+                        
                     } else {
                         let error = NSError(domain: "com.artApps.sdk", code: 204, userInfo: [NSLocalizedDescriptionKey: "No Fill"])
                         print("[ArtApps] No fill for placement: \(self.placementId)")
@@ -100,11 +101,8 @@ public class ArtAppsInterstitial: NSObject {
         presenter?.delegate = self
         
         presenter?.modalPresentationStyle = .fullScreen
-        
-        if ArtApps.shared.canShowAd() {
-            viewController.present(presenter!, animated: true)
-         }
-//        viewController.present(presenter!, animated: true)
+      
+        viewController.present(presenter!, animated: true)
     }
 }
 
