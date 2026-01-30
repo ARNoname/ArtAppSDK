@@ -15,7 +15,7 @@ public class ArtApps {
     private var serverRestrictionsUpdatedAt: Date?
     
     // Configurable thresholds (could be remote config in future)
-    public var sessionGateSeconds: TimeInterval =  30//0
+    public var sessionGateSeconds: TimeInterval =  0
     public var frequencyCapSeconds: TimeInterval = 90
     
     public private(set) var serverCooldownSeconds: TimeInterval?
