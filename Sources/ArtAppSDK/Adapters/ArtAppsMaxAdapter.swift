@@ -142,11 +142,6 @@ class ArtAppsInterstitialAdapterDelegate: ArtAppsInterstitialDelegate {
         return MAAdapterError.unspecified
     }
     
-    func artAppsInterstitial(_ ad: ArtAppsInterstitial, didFailToDisplay error: Error) {
-        print("[ArtAppsMaxAdapter] Delegate received: didFailToDisplay (\(error.localizedDescription))")
-        maxDelegate.didFailToDisplayInterstitialAdWithError(MAAdapterError.adNotReady)
-    }
-    
     func artAppsInterstitialDidDisplay(_ ad: ArtAppsInterstitial) {
         print("[ArtAppsMaxAdapter] Delegate received: artAppsInterstitialDidDisplay 🤡")
         maxDelegate.didDisplayInterstitialAd()
