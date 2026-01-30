@@ -8,7 +8,17 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
 
     private var interstitialAd: ArtAppsInterstitial?
     private var adapterDelegate: ArtAppsInterstitialAdapterDelegate?
+    var interstitialAds: MAInterstitialAd!
 
+    public override init() {
+        super.init()
+        interstitialAds = MAInterstitialAd(adUnitIdentifier: "e92145792bb5cf0b")
+        
+        let initConfig = ALSdkInitializationConfiguration(sdkKey: "09rbTeGuCEAgofu7BBfIXm7KAbqsTQKBt9MTA9Bp_M1G6a2CaDroOGXnSXIprSFHnzGeXKpV7gcsXdS5o8NN8O") { builder in
+            builder.mediationProvider = ALMediationProviderMAX
+        }
+    }
+    
     // MARK: - MAAdapter Methods
 
     public override func initialize(with parameters: MAAdapterInitializationParameters, completionHandler: @escaping (MAAdapterInitializationStatus, String?) -> Void) {
