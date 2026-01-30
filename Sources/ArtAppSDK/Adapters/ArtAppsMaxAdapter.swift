@@ -20,8 +20,6 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
         
         let params = UncheckedSendable(value: (partnerId, appId, completionHandler))
     
-        print("[ServerParameters]: \(params)")
-        
         DispatchQueue.main.async {
             ArtApps.shared.initialize(partnerId: params.value.0, appId: params.value.1)
             params.value.2(.initializedSuccess, nil)
@@ -48,10 +46,7 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
     // MARK: - MAInterstitialAdapter Methods
 
     public func loadInterstitialAd(for parameters: MAAdapterResponseParameters, andNotify delegate: MAInterstitialAdapterDelegate) {
-        
-        // In newer SDKs, thirdPartyAdPlacementIdentifier might be non-optional.
-        // We use 'let' directly. If it happens to be optional in some versions,
-        // coalescing it to empty string is safe.
+        print("[ArtAppsMaxAdapter]: loadInterstitialAd 👁️")
         let placementId = parameters.thirdPartyAdPlacementIdentifier
         
         let captured = UncheckedSendable(value: (self, delegate, placementId))
@@ -73,6 +68,8 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
     }
 
     public func showInterstitialAd(for parameters: MAAdapterResponseParameters, andNotify delegate: MAInterstitialAdapterDelegate) {
+        print("[ArtAppsMaxAdapter]: showInterstitialAd 👁️")
+        
         let captured = UncheckedSendable(value: (self, delegate))
         
         DispatchQueue.main.async {
@@ -96,6 +93,7 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
 
 @MainActor
 class ArtAppsInterstitialAdapterDelegate: ArtAppsInterstitialDelegate {
+    
     private weak var parentAdapter: ArtAppsMaxAdapter?
     private let maxDelegate: MAInterstitialAdapterDelegate
     
@@ -105,12 +103,12 @@ class ArtAppsInterstitialAdapterDelegate: ArtAppsInterstitialDelegate {
     }
     
     func artAppsInterstitialDidLoad(_ ad: ArtAppsInterstitial) {
-        print("[ArtAppsMaxAdapter] Delegate received: artAppsInterstitialDidLoad")
+        print("[ArtAppsMaxAdapter] Delegate received: artAppsInterstitialDidLoad 🤡")
         maxDelegate.didLoadInterstitialAd()
     }
     
     func artAppsInterstitial(_ ad: ArtAppsInterstitial, didFailToLoad error: Error) {
-        print("[ArtAppsMaxAdapter] Delegate received: didFailToLoad (\(error.localizedDescription))")
+        print("[ArtAppsMaxAdapter] Delegate received: didFailToLoad (\(error.localizedDescription)) 🤡")
         // Map error to MAAdapterError if possible, or generic
         maxDelegate.didFailToLoadInterstitialAdWithError(mapError(error))
     }
@@ -145,15 +143,17 @@ class ArtAppsInterstitialAdapterDelegate: ArtAppsInterstitialDelegate {
     }
     
     func artAppsInterstitialDidDisplay(_ ad: ArtAppsInterstitial) {
-        print("[ArtAppsMaxAdapter] Delegate received: artAppsInterstitialDidDisplay")
+        print("[ArtAppsMaxAdapter] Delegate received: artAppsInterstitialDidDisplay 🤡")
         maxDelegate.didDisplayInterstitialAd()
     }
     
     func artAppsInterstitialDidHide(_ ad: ArtAppsInterstitial) {
+        print("[ArtAppsMaxAdapter] Delegate received: artAppsInterstitialDidHide 🤡")
         maxDelegate.didHideInterstitialAd()
     }
     
     func artAppsInterstitialDidClick(_ ad: ArtAppsInterstitial) {
+        print("[ArtAppsMaxAdapter] Delegate received: artAppsInterstitialDidClick 🤡")
         maxDelegate.didClickInterstitialAd()
     }
 }
