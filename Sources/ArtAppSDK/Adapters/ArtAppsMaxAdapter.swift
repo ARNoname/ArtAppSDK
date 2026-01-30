@@ -118,8 +118,11 @@ class ArtAppsInterstitialAdapterDelegate: ArtAppsInterstitialDelegate {
             switch sdkError.code {
             case 100:
                 return MAAdapterError.notInitialized
-            case 204, 205:
+            case 204:
                 return MAAdapterError.noFill
+            case 205:
+                // Return unspecified to avoid aggressive 'No Fill' throttling by MAX, allowing retries to pass through earlier
+                return MAAdapterError.unspecified
             default:
                 break
             }
