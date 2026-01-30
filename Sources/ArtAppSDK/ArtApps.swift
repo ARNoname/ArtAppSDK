@@ -108,12 +108,4 @@ public class ArtApps {
         }
         return false
     }
-    /// Returns the number of seconds remaining until the session gate opens.
-    /// Returns 0 if the gate is already open.
-    public func timeUntilSessionGatePasses() -> TimeInterval {
-        let now = Date()
-        let effectiveSessionGate = currentServerSessionGate(at: now) ?? sessionGateSeconds
-        let timePassed = now.timeIntervalSince(startTime)
-        return max(0, effectiveSessionGate - timePassed)
-    }
 }
