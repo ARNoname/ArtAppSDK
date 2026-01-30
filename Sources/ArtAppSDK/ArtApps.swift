@@ -14,7 +14,6 @@ public class ArtApps {
     private var lastAdShowTime: Date?
     private var serverRestrictionsUpdatedAt: Date?
     
-    // Configurable thresholds (could be remote config in future)
     public var sessionGateSeconds: TimeInterval =  0
     public var frequencyCapSeconds: TimeInterval = 90
     
@@ -37,9 +36,11 @@ public class ArtApps {
          if let baseURL = baseURL {
              ArtAppsNetworkManager.shared.baseURL = baseURL
          }
+        
          self.isInitialized = true
+        
          print("[ArtApps] Initialized at \(startTime). PartnerID: \(partnerId)")
-        print("[ArtApps] Initialized at \(startTime). AppID: \(appId)")
+         print("[ArtApps] Initialized at \(startTime). AppID: \(appId)")
      }
 
      public var baseURL: String {
@@ -52,6 +53,7 @@ public class ArtApps {
         
         // 1. Session Gate
         let effectiveSessionGate = currentServerSessionGate(at: now) ?? sessionGateSeconds
+        
         if now.timeIntervalSince(startTime) < effectiveSessionGate {
             let source = currentServerSessionGate(at: now) == nil ? "Local" : "Server"
             print("[ArtApps] Blocked by \(source) Session Gate (need \(effectiveSessionGate)s, passed \(Int(now.timeIntervalSince(startTime)))s)")

@@ -2,35 +2,6 @@
 import Combine
 import Foundation
 
-enum ArtAppsNetworkError: Error {
-    case invalidURL
-    case noData
-    case decodingError
-    case serverError(String)
-}
-
-struct ArtAppsAdResponse: Codable {
-    let requestId: String? // Changed to optional
-    let finalUrl: String?  // Changed to optional (can be missing if allow=false)
-    let ttl: Int? // Changed to optional (can be missing if allow=false)
-    let allow: Bool?
-    let cooldownSec: Int?
-    let sessionGate: Int?
-    let fallback: Bool?
-    let trackUrl: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case requestId = "request_id"
-        case finalUrl = "final_url"
-        case ttl
-        case allow
-        case cooldownSec = "cooldown_sec"
-        case sessionGate = "session_gate"
-        case fallback
-        case trackUrl = "track_url"
-    }
-}
-
 @MainActor
 class ArtAppsNetworkManager {
     @MainActor static let shared = ArtAppsNetworkManager()
@@ -39,14 +10,9 @@ class ArtAppsNetworkManager {
     var baseURL = "https://api.adw.net/applovin/request"
     
     func fetchAd(partnerId: String, appId: String, placementId: String, completion: @escaping @Sendable (Result<ArtAppsAdResponse, Error>) -> Void) {
-        // Construct URL components
+        
         guard var components = URLComponents(string: baseURL) else {
-#if DEBUG
-            // Fallback for demo purposes if URL is not real yet
-            mockResponse(completion: completion)
-#else
             completion(.failure(ArtAppsNetworkError.invalidURL))
-#endif
             return
         }
         
@@ -61,14 +27,6 @@ class ArtAppsNetworkManager {
             completion(.failure(ArtAppsNetworkError.invalidURL))
             return
         }
-        
-#if DEBUG
-        // For now, if the domain is placeholder, return mock immediately
-        if baseURL.contains("your-server-domain.com") {
-            mockResponse(completion: completion)
-            return
-        }
-#endif
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -97,25 +55,6 @@ class ArtAppsNetworkManager {
                 
             } catch {
                 completion(.failure(error))
-            }
-        }
-    }
-    
-    private func mockResponse(completion: @escaping @Sendable (Result<ArtAppsAdResponse, Error>) -> Void) {
-        // Simulate network delay slightly
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) {
-            let mock = ArtAppsAdResponse(
-                requestId: UUID().uuidString,
-                finalUrl: "https://globytrace.com/mdHtMx", // Demo URL
-                ttl: 3600,
-                allow: true,
-                cooldownSec: 60,
-                sessionGate: 30,
-                fallback: false,
-                trackUrl: "https://api.adw.net/applovin/track?request_id=mock_id&event=impression"
-            )
-            DispatchQueue.main.async {
-                completion(.success(mock))
             }
         }
     }

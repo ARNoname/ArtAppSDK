@@ -41,6 +41,7 @@ public class ArtAppsInterstitial: NSObject {
         }
         
         isReady = false
+        
         ArtAppsNetworkManager.shared.fetchAd(partnerId: partnerId, appId: appId, placementId: placementId) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -64,6 +65,7 @@ public class ArtAppsInterstitial: NSObject {
                         print("[ArtApps] No fill for placement: \(self.placementId)")
                         self.delegate?.artAppsInterstitial(self, didFailToLoad: error)
                     }
+                    
                 case .failure(let error):
                     print("[ArtApps] Load failed: \(error.localizedDescription)")
                     self.delegate?.artAppsInterstitial(self, didFailToLoad: error)

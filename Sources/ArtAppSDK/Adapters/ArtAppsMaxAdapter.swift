@@ -2,14 +2,7 @@
 
 import Foundation
 import UIKit
-
-// Uncomment the import below when AppLovinSDK is added to the project
- import AppLovinSDK
-
-// NOTE: This class usually needs to inherit from ALMediationAdapter.
-// Since AppLovinSDK might not be installed in this workspace yet,
-// I am strictly defining the structure. You MUST ensure AppLovinSDK is linked.
-
+import AppLovinSDK
 
 @objc(ArtAppsMaxAdapter)
 public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
@@ -20,11 +13,9 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
     // MARK: - MAAdapter Methods
 
     public override func initialize(with parameters: MAAdapterInitializationParameters, completionHandler: @escaping (MAAdapterInitializationStatus, String?) -> Void) {
+        
         let serverParameters = parameters.serverParameters
         
-        // Extract IDs from serverParameters (configured in MAX dashboard)
-        // Extract IDs from serverParameters (configured in MAX dashboard)
-        // Fallback to test credentials if missing
         let partnerId = (serverParameters["partner_id"] as? String) ?? "test_partner"
         let appId = (serverParameters["app_id"] as? String) ?? "test_app"
         
@@ -100,74 +91,4 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
     }
 }
 
-// MARK: - Delegate Wrapper
-
-@MainActor
-class ArtAppsInterstitialAdapterDelegate: ArtAppsInterstitialDelegate {
-    private weak var parentAdapter: ArtAppsMaxAdapter?
-    private let maxDelegate: MAInterstitialAdapterDelegate
-    
-    init(parentAdapter: ArtAppsMaxAdapter, delegate: MAInterstitialAdapterDelegate) {
-        self.parentAdapter = parentAdapter
-        self.maxDelegate = delegate
-    }
-    
-    func artAppsInterstitialDidLoad(_ ad: ArtAppsInterstitial) {
-        maxDelegate.didLoadInterstitialAd()
-    }
-    
-    func artAppsInterstitial(_ ad: ArtAppsInterstitial, didFailToLoad error: Error) {
-        // Map error to MAAdapterError if possible, or generic
-        maxDelegate.didFailToLoadInterstitialAdWithError(mapError(error))
-    }
-    
-    private func mapError(_ error: Error) -> MAAdapterError {
-        if let sdkError = error as NSError?, sdkError.domain == "com.artApps.sdk" {
-            switch sdkError.code {
-            case 100:
-                return MAAdapterError.notInitialized
-            case 204:
-                return MAAdapterError.noFill
-            default:
-                break
-            }
-        }
-        
-        if let urlError = error as? URLError {
-            switch urlError.code {
-            case .timedOut,
-                    .notConnectedToInternet,
-                    .networkConnectionLost,
-                    .cannotFindHost,
-                    .cannotConnectToHost,
-                    .dnsLookupFailed:
-                return MAAdapterError.unspecified
-            default:
-                break
-            }
-        }
-        
-        if error is ArtAppsNetworkError {
-            return MAAdapterError.unspecified
-        }
-        
-        return MAAdapterError.unspecified
-    }
-    
-    func artAppsInterstitialDidDisplay(_ ad: ArtAppsInterstitial) {
-        maxDelegate.didDisplayInterstitialAd()
-    }
-    
-    func artAppsInterstitialDidHide(_ ad: ArtAppsInterstitial) {
-        maxDelegate.didHideInterstitialAd()
-    }
-    
-    func artAppsInterstitialDidClick(_ ad: ArtAppsInterstitial) {
-        maxDelegate.didClickInterstitialAd()
-    }
-}
-
-struct UncheckedSendable<T>: @unchecked Sendable {
-    let value: T
-}
 
