@@ -58,14 +58,14 @@ public class ArtAppsInterstitial: NSObject {
                         // Check if we need to wait for Session Gate
                         let delay = ArtApps.shared.timeUntilSessionGatePasses()
                         if delay > 0 {
-                            print("[ArtApps] Ad loaded but held by Session Gate. Waiting \(Int(delay))s...")
-                        }
-                        
-                        // Schedule notification
-                        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                             self.isReady = true
-                             print("[ArtApps] Interstitial loaded for placement: \(self.placementId)")
-                             self.delegate?.artAppsInterstitialDidLoad(self)
+                            print("[ArtApps] Received Ad, but blocked by Session Gate (wait \(Int(delay))s). Marking as failed to trigger retry.")
+                            let error = NSError(domain: "com.artApps.sdk", code: 205, userInfo: [NSLocalizedDescriptionKey: "Session Gate Active"])
+                            self.delegate?.artAppsInterstitial(self, didFailToLoad: error)
+                        } else {
+                            self.adResponse = response
+                            self.isReady = true
+                            print("[ArtApps] Interstitial loaded for placement: \(self.placementId)")
+                            self.delegate?.artAppsInterstitialDidLoad(self)
                         }
                     } else {
                         let error = NSError(domain: "com.artApps.sdk", code: 204, userInfo: [NSLocalizedDescriptionKey: "No Fill"])
