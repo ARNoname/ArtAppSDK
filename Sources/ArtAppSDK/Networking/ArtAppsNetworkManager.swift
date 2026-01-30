@@ -32,7 +32,7 @@ class ArtAppsNetworkManager {
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.timeoutInterval = 1.5 // Fast timeout as requested
+        request.timeoutInterval = 5.0 // Increased to prevent MAX timeout
         
         Task {
             do {
