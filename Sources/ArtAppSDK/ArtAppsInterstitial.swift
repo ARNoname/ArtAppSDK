@@ -34,11 +34,12 @@ public class ArtAppsInterstitial: NSObject {
         }
         
         // Check Pilot Rules (Session Gate / Frequency Cap)
-//        if !ArtApps.shared.canShowAd() {
-//            let error = NSError(domain: "com.artApps.sdk", code: 205, userInfo: [NSLocalizedDescriptionKey: "Frequency/Session Cap"])
-//            delegate?.artAppsInterstitial(self, didFailToLoad: error)
-//            return
-//        }
+        // Check Pilot Rules (Session Gate / Frequency Cap)
+        if !ArtApps.shared.canShowAd() {
+            let error = NSError(domain: "com.artApps.sdk", code: 205, userInfo: [NSLocalizedDescriptionKey: "Frequency/Session Cap"])
+            delegate?.artAppsInterstitial(self, didFailToLoad: error)
+            return
+        }
         
         isReady = false
         
@@ -53,19 +54,21 @@ public class ArtAppsInterstitial: NSObject {
                         sessionGateSeconds: response.sessionGate,
                         ttlSeconds: response.ttl
                     )
+
+                    // Re-check rules with updated server data
+                    if !ArtApps.shared.canShowAd() {
+                        let error = NSError(domain: "com.artApps.sdk", code: 206, userInfo: [NSLocalizedDescriptionKey: "Blocked by updated Session Gate/Freq Cap"])
+                        print("[ArtApps] Ad loaded but blocked by updated restrictions.")
+                        self.delegate?.artAppsInterstitial(self, didFailToLoad: error)
+                        return
+                    }
                     
                     if response.allow == true {
                         self.adResponse = response
                         
-                        if !ArtApps.shared.canShowAd() {
-                            self.isReady = true
-                            print("[ArtApps] Interstitial loaded for placement: \(self.placementId)")
-                            self.delegate?.artAppsInterstitialDidLoad(self)
-                        }
-                        
-//                        self.isReady = true
-//                        print("[ArtApps] Interstitial loaded for placement: \(self.placementId)")
-//                        self.delegate?.artAppsInterstitialDidLoad(self)
+                        self.isReady = true
+                        print("[ArtApps] Interstitial loaded for placement: \(self.placementId)")
+                        self.delegate?.artAppsInterstitialDidLoad(self)
                         
                     } else {
                         let error = NSError(domain: "com.artApps.sdk", code: 204, userInfo: [NSLocalizedDescriptionKey: "No Fill"])
