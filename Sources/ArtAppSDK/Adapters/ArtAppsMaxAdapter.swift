@@ -20,6 +20,7 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
         let appId = (serverParameters["app_id"] as? String) ?? "test_app"
         
         let params = UncheckedSendable(value: (partnerId, appId, completionHandler))
+    
         print("[ServerParameters]: \(params)")
         
         DispatchQueue.main.async {
@@ -62,6 +63,8 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
             let placementId = captured.value.2
             
             strongSelf.interstitialAd = ArtAppsInterstitial(placementId: placementId)
+            
+            print("[StrongSelf.interstitialAd]: \(String(describing: strongSelf.interstitialAd))")
             
             // Retain the delegate strongly
             let adDelegate = ArtAppsInterstitialAdapterDelegate(parentAdapter: strongSelf, delegate: delegate)
