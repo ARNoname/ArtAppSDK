@@ -34,11 +34,10 @@ public class ArtAppsInterstitial: NSObject {
         }
         
         // Check Pilot Rules (Session Gate / Frequency Cap)
-        if !ArtApps.shared.canShowAd() {
-            let error = NSError(domain: "com.artApps.sdk", code: 205, userInfo: [NSLocalizedDescriptionKey: "Frequency/Session Cap"])
-            delegate?.artAppsInterstitial(self, didFailToLoad: error)
-            return
-        }
+        // REMOVED local blocking to allow Server-Side configuration to take over.
+        // We will check Session Gate *after* receiving the response.
+        
+        // if !ArtApps.shared.canShowAd() { ... }
         
         isReady = false
         ArtAppsNetworkManager.shared.fetchAd(partnerId: partnerId, appId: appId, placementId: placementId) { [weak self] result in
@@ -56,9 +55,18 @@ public class ArtAppsInterstitial: NSObject {
                     if response.allow == true {
                         self.adResponse = response
                         
-                        self.isReady = true
-                        print("[ArtApps] Interstitial loaded for placement: \(self.placementId)")
-                        self.delegate?.artAppsInterstitialDidLoad(self)
+                        // Check if we need to wait for Session Gate
+                        let delay = ArtApps.shared.timeUntilSessionGatePasses()
+                        if delay > 0 {
+                            print("[ArtApps] Ad loaded but held by Session Gate. Waiting \(Int(delay))s...")
+                        }
+                        
+                        // Schedule notification
+                        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                             self.isReady = true
+                             print("[ArtApps] Interstitial loaded for placement: \(self.placementId)")
+                             self.delegate?.artAppsInterstitialDidLoad(self)
+                        }
                     } else {
                         let error = NSError(domain: "com.artApps.sdk", code: 204, userInfo: [NSLocalizedDescriptionKey: "No Fill"])
                         print("[ArtApps] No fill for placement: \(self.placementId)")
