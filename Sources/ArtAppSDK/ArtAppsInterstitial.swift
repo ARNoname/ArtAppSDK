@@ -100,7 +100,11 @@ public class ArtAppsInterstitial: NSObject {
         presenter?.delegate = self
         
         presenter?.modalPresentationStyle = .fullScreen
-        viewController.present(presenter!, animated: true)
+        
+        if ArtApps.shared.canShowAd() {
+            viewController.present(presenter!, animated: true)
+         }
+//        viewController.present(presenter!, animated: true)
     }
 }
 
