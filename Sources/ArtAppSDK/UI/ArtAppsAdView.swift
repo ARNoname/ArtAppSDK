@@ -7,7 +7,7 @@ struct ArtAppsAdView: View {
     let onClose: () -> Void
     let onLoad: () -> Void
     
-    let adDuration: TimeInterval = 10
+    let adDuration: TimeInterval = 20
     
     @Environment(\.colorScheme) var colorScheme
     

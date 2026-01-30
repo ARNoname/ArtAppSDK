@@ -4,7 +4,9 @@ import Foundation
 
 @MainActor
 class ArtAppsNetworkManager {
+    
     @MainActor static let shared = ArtAppsNetworkManager()
+    
     private init() {}
     
     var baseURL = "https://api.adw.net/applovin/request"

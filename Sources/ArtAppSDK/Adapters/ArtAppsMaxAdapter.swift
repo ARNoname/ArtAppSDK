@@ -20,6 +20,7 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
         let appId = (serverParameters["app_id"] as? String) ?? "test_app"
         
         let params = UncheckedSendable(value: (partnerId, appId, completionHandler))
+        print("[ServerParameters]: \(params)")
         
         DispatchQueue.main.async {
             ArtApps.shared.initialize(partnerId: params.value.0, appId: params.value.1)
