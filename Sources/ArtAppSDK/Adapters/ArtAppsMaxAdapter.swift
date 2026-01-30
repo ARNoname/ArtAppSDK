@@ -64,7 +64,7 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
             
             strongSelf.interstitialAd = ArtAppsInterstitial(placementId: placementId)
             
-            print("[StrongSelf.interstitialAd]: \(String(describing: strongSelf.interstitialAd))")
+            print("[StrongSelf.placementId]: \(String(describing: placementId))")
             
             // Retain the delegate strongly
             let adDelegate = ArtAppsInterstitialAdapterDelegate(parentAdapter: strongSelf, delegate: delegate)
@@ -91,6 +91,7 @@ public class ArtAppsMaxAdapter: ALMediationAdapter, MAInterstitialAdapter {
             let presentingVC = ALUtils.topViewControllerFromKeyWindow()
             
             ad.show(from: presentingVC)
+            print("[StrongSelf.show]")
         }
     }
 }
