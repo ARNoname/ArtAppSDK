@@ -12,6 +12,7 @@ public class ArtAppsManager: NSObject {
     private var sdkKey: String?
     
     private var retryAttempt = 0.0
+    private var isLoading = false
     
     // Callback for when ad is loaded (optional, helpful for UI updates)
     public var onAdLoaded: (() -> Void)?
@@ -59,7 +60,13 @@ public class ArtAppsManager: NSObject {
             return
         }
         
+        if isLoading {
+            print("[ArtAppsManager] Load skipped: Ad is already loading.")
+            return
+        }
+        
         print("[ArtAppsManager] Loading ad...")
+        isLoading = true
         interstitialAd.load()
     }
     
@@ -93,6 +100,7 @@ extension ArtAppsManager: @MainActor MAAdDelegate {
     public func didLoad(_ ad: MAAd) {
         print("[ArtAppsManager] Ad Loaded")
         
+        isLoading = false
         // Reset retry attempt on success
         retryAttempt = 0.0
         
@@ -105,6 +113,8 @@ extension ArtAppsManager: @MainActor MAAdDelegate {
     
     public func didFailToLoadAd(forAdUnitIdentifier adUnitIdentifier: String, withError error: MAError) {
         print("[ArtAppsManager] Ad Failed to Load: \(error.message). Code: \(error.code.rawValue)")
+        
+        isLoading = false
         
         // Exponential retry logic (AppLovin recommendation)
         retryAttempt += 1
