@@ -34,11 +34,8 @@ public class ArtAppsInterstitial: NSObject {
         }
         
         // Check Pilot Rules (Session Gate / Frequency Cap)
-        if !ArtApps.shared.canShowAd() {
-            let error = NSError(domain: "com.artApps.sdk", code: 205, userInfo: [NSLocalizedDescriptionKey: "Frequency/Session Cap"])
-            delegate?.artAppsInterstitial(self, didFailToLoad: error)
-            return
-        }
+        // MOVED TO SHOW() - We must load to get server config
+        // if !ArtApps.shared.canShowAd() { ... }
         
         isReady = false
         
@@ -76,6 +73,14 @@ public class ArtAppsInterstitial: NSObject {
     }
     
     public func show(from viewController: UIViewController) {
+        
+        // Check Pilot Rules (Session Gate / Frequency Cap)
+        if !ArtApps.shared.canShowAd() {
+             print("[ArtApps] Show blocked by Session Gate/Freq Cap. Try again later.")
+             let error = NSError(domain: "com.artApps.sdk", code: 304, userInfo: [NSLocalizedDescriptionKey: "Blocked by Session Gate/Freq Cap"])
+            delegate?.artAppsInterstitial(self, didFailToLoad: error)
+             return 
+        }
 
         guard isReady else {
             let error = NSError(domain: "com.artApps.sdk", code: 301, userInfo: [NSLocalizedDescriptionKey: "Ad not ready"])
