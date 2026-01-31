@@ -3,23 +3,31 @@ import AppLovinSDK
 import UIKit
 
 @MainActor
-public class ArtAppsManager: NSObject, ObservableObject {
-  
+public class ArtAppsManager: NSObject {
+    
+    public static let shared = ArtAppsManager()
+    
     private var interstitialAd: MAInterstitialAd?
-    private let adUnitId: String
-    private let sdkKey: String
+    private var adUnitId: String?
+    private var sdkKey: String?
     
     // Callback for when ad is loaded (optional, helpful for UI updates)
     public var onAdLoaded: (() -> Void)?
     
-    public init(adUnitId: String, sdkKey: String) {
+    private override init() {
+        super.init()
+    }
+    
+    public func initialize(adUnitId: String, sdkKey: String) {
         self.adUnitId = adUnitId
         self.sdkKey = sdkKey
-        super.init()
+        
         initializeSDK()
     }
     
     private func initializeSDK() {
+        guard let sdkKey = sdkKey else { return }
+        
         // Create the initialization configuration
         let initConfig = ALSdkInitializationConfiguration(sdkKey: sdkKey) { builder in
             builder.mediationProvider = ALMediationProviderMAX
@@ -32,11 +40,13 @@ public class ArtAppsManager: NSObject, ObservableObject {
             
             DispatchQueue.main.async {
                 // Initialize interstitial
-                self.interstitialAd = MAInterstitialAd(adUnitIdentifier: self.adUnitId)
-                self.interstitialAd?.delegate = self
-                
-                // Initial load
-                self.load()
+                if let adUnitId = self.adUnitId {
+                    self.interstitialAd = MAInterstitialAd(adUnitIdentifier: adUnitId)
+                    self.interstitialAd?.delegate = self
+                    
+                    // Initial load
+                    self.load()
+                }
             }
         }
     }
