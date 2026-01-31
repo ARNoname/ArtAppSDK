@@ -31,6 +31,7 @@ class ArtAppsNetworkManager {
         }
         
         var request = URLRequest(url: url)
+        print("[ArtApps] Network Request URL: \(url.absoluteString)")
         request.httpMethod = "GET"
         request.timeoutInterval = 5.0 // Increased to prevent MAX timeout
         
