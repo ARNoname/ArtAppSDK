@@ -11,6 +11,8 @@ public class ArtAppsManager: NSObject {
     private var adUnitId: String?
     private var sdkKey: String?
     
+    private var retryAttempt = 0.0
+    
     // Callback for when ad is loaded (optional, helpful for UI updates)
     public var onAdLoaded: (() -> Void)?
     
@@ -56,6 +58,7 @@ public class ArtAppsManager: NSObject {
             print("[ArtAppsManager] Ad not initialized yet")
             return
         }
+        
         print("[ArtAppsManager] Loading ad...")
         interstitialAd.load()
     }
@@ -89,6 +92,10 @@ extension ArtAppsManager: @MainActor MAAdDelegate {
     
     public func didLoad(_ ad: MAAd) {
         print("[ArtAppsManager] Ad Loaded")
+        
+        // Reset retry attempt on success
+        retryAttempt = 0.0
+        
         onAdLoaded?()
         
         // Optional: Auto-show behavior if desired, but user asked for explicit .show() calls usually.
@@ -99,9 +106,12 @@ extension ArtAppsManager: @MainActor MAAdDelegate {
     public func didFailToLoadAd(forAdUnitIdentifier adUnitIdentifier: String, withError error: MAError) {
         print("[ArtAppsManager] Ad Failed to Load: \(error.message). Code: \(error.code.rawValue)")
         
-        // Retry logic moved here from AppDelegate
-        print("[ArtAppsManager] Scheduling retry in 10 seconds...")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+        // Exponential retry logic (AppLovin recommendation)
+        retryAttempt += 1
+        let delaySec = pow(2.0, min(6.0, retryAttempt))
+        
+        print("[ArtAppsManager] Scheduling retry in \(delaySec) seconds...")
+        DispatchQueue.main.asyncAfter(deadline: .now() + delaySec) {
             print("[ArtAppsManager] Retrying load now...")
             self.load()
         }
