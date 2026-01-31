@@ -135,12 +135,15 @@ extension ArtAppsManager: @MainActor MAAdDelegate {
         
         // Retry logic for display failure (Session Gate block)
         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-            print("[ArtAppsManager] Retrying (load -> show cycle via load)...")
-            // Note: In strict MAX flows, we often need to call load() again if show fails? 
-            // Or just try showing again if it's still "ready"? 
-            // In our Adapter logic, "failed to display" might not consume the ad if it was just blocked logic.
-            // But MAX might consider it "attempted". safer to Load.
-            self.load()
+            print("[ArtAppsManager] Retrying...")
+            
+            if self.isReady {
+                print("[ArtAppsManager] Ad is still ready. Retrying show()...")
+                self.show()
+            } else {
+                print("[ArtAppsManager] Ad not ready. Retrying load()...")
+                self.load()
+            }
         }
     }
 }
