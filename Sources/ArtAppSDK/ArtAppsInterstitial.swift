@@ -5,7 +5,6 @@ public protocol ArtAppsInterstitialDelegate: AnyObject {
     func artAppsInterstitialDidLoad(_ ad: ArtAppsInterstitial)
     func artAppsInterstitial(_ ad: ArtAppsInterstitial, didFailToLoad error: Error)
     func artAppsInterstitialDidDisplay(_ ad: ArtAppsInterstitial)
-    func artAppsInterstitial(_ ad: ArtAppsInterstitial, didFailToDisplay error: Error)
     func artAppsInterstitialDidHide(_ ad: ArtAppsInterstitial)
     func artAppsInterstitialDidClick(_ ad: ArtAppsInterstitial) // Optional depending on WebView interaction
 }
@@ -35,8 +34,11 @@ public class ArtAppsInterstitial: NSObject {
         }
         
         // Check Pilot Rules (Session Gate / Frequency Cap)
-        // MOVED TO SHOW() - We must load to get server config
-        // if !ArtApps.shared.canShowAd() { ... }
+        if !ArtApps.shared.canShowAd() {
+            let error = NSError(domain: "com.artApps.sdk", code: 205, userInfo: [NSLocalizedDescriptionKey: "Frequency/Session Cap"])
+            delegate?.artAppsInterstitial(self, didFailToLoad: error)
+            return
+        }
         
         isReady = false
         
@@ -74,14 +76,6 @@ public class ArtAppsInterstitial: NSObject {
     }
     
     public func show(from viewController: UIViewController) {
-        
-        // Check Pilot Rules (Session Gate / Frequency Cap)
-        if !ArtApps.shared.canShowAd() {
-             print("[ArtApps] Show blocked by Session Gate/Freq Cap. Try again later.")
-             let error = NSError(domain: "com.artApps.sdk", code: 304, userInfo: [NSLocalizedDescriptionKey: "Blocked by Session Gate/Freq Cap"])
-             delegate?.artAppsInterstitial(self, didFailToDisplay: error)
-             return 
-        }
 
         guard isReady else {
             let error = NSError(domain: "com.artApps.sdk", code: 301, userInfo: [NSLocalizedDescriptionKey: "Ad not ready"])

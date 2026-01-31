@@ -12,7 +12,6 @@ public class ArtAppsManager: NSObject {
     private var sdkKey: String?
     
     private var retryAttempt = 0.0
-    private var isLoading = false
     
     // Callback for when ad is loaded (optional, helpful for UI updates)
     public var onAdLoaded: (() -> Void)?
@@ -60,13 +59,7 @@ public class ArtAppsManager: NSObject {
             return
         }
         
-        if isLoading {
-            print("[ArtAppsManager] Load skipped: Ad is already loading.")
-            return
-        }
-        
         print("[ArtAppsManager] Loading ad...")
-        isLoading = true
         interstitialAd.load()
     }
     
@@ -76,15 +69,9 @@ public class ArtAppsManager: NSObject {
             return
         }
         
-        // Check Session Gate / Freq Cap locally first!
-        // This prevents notifying AppLovin of a "failure" and keeps the ad ready.
-        if !ArtApps.shared.canShowAd() {
-            print("[ArtAppsManager] Show blocked by Session Gate/Freq Cap. Waiting 10s to retry...")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-                self.show()
-            }
-            return
-        }
+        // We can check our own rules locally if needed, but Adapter handles it too.
+        // It's safer to let the Adapter reject 'show' if session gate is active, 
+        // triggering didFail(toDisplay) -> retry loop.
         
         if interstitialAd.isReady {
             interstitialAd.show()
@@ -106,7 +93,6 @@ extension ArtAppsManager: @MainActor MAAdDelegate {
     public func didLoad(_ ad: MAAd) {
         print("[ArtAppsManager] Ad Loaded")
         
-        isLoading = false
         // Reset retry attempt on success
         retryAttempt = 0.0
         
@@ -119,8 +105,6 @@ extension ArtAppsManager: @MainActor MAAdDelegate {
     
     public func didFailToLoadAd(forAdUnitIdentifier adUnitIdentifier: String, withError error: MAError) {
         print("[ArtAppsManager] Ad Failed to Load: \(error.message). Code: \(error.code.rawValue)")
-        
-        isLoading = false
         
         // Exponential retry logic (AppLovin recommendation)
         retryAttempt += 1
@@ -151,15 +135,12 @@ extension ArtAppsManager: @MainActor MAAdDelegate {
         
         // Retry logic for display failure (Session Gate block)
         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-            print("[ArtAppsManager] Retrying...")
-            
-            if self.isReady {
-                print("[ArtAppsManager] Ad is still ready. Retrying show()...")
-                self.show()
-            } else {
-                print("[ArtAppsManager] Ad not ready. Retrying load()...")
-                self.load()
-            }
+            print("[ArtAppsManager] Retrying (load -> show cycle via load)...")
+            // Note: In strict MAX flows, we often need to call load() again if show fails? 
+            // Or just try showing again if it's still "ready"? 
+            // In our Adapter logic, "failed to display" might not consume the ad if it was just blocked logic.
+            // But MAX might consider it "attempted". safer to Load.
+            self.load()
         }
     }
 }

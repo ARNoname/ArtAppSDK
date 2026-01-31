@@ -14,11 +14,10 @@ public class ArtApps {
     private var lastAdShowTime: Date?
     private var serverRestrictionsUpdatedAt: Date?
     
-    public var sessionGateSeconds: TimeInterval =  0
     public var frequencyCapSeconds: TimeInterval = 90
     
     public private(set) var serverCooldownSeconds: TimeInterval?
-    public private(set) var serverSessionGateSeconds: TimeInterval?
+    // public private(set) var serverSessionGateSeconds: TimeInterval? // Removed
     public private(set) var serverTtlSeconds: TimeInterval?
     
     private init() {}
@@ -51,14 +50,9 @@ public class ArtApps {
     public func canShowAd() -> Bool {
         let now = Date()
         
-        // 1. Session Gate
-        let effectiveSessionGate = currentServerSessionGate(at: now) ?? sessionGateSeconds
+        // 1. Session Gate check REMOVED
         
-        if now.timeIntervalSince(startTime) < effectiveSessionGate {
-            let source = currentServerSessionGate(at: now) == nil ? "Local" : "Server"
-            print("[ArtApps] Blocked by \(source) Session Gate (need \(effectiveSessionGate)s, passed \(Int(now.timeIntervalSince(startTime)))s)")
-            return false
-        }
+        // 2. Cooldown (server overrides local frequency cap)
         
         // 2. Cooldown (server overrides local frequency cap)
          let effectiveCooldownSeconds = currentServerCooldownSeconds(at: now) ?? frequencyCapSeconds
@@ -74,7 +68,7 @@ public class ArtApps {
     public func updateServerRestrictions(cooldownSeconds: Int?, sessionGateSeconds: Int?, ttlSeconds: Int?) {
           serverRestrictionsUpdatedAt = Date()
           serverCooldownSeconds = cooldownSeconds.map { TimeInterval($0) }
-          serverSessionGateSeconds = sessionGateSeconds.map { TimeInterval($0) }
+          // serverSessionGateSeconds = sessionGateSeconds.map { TimeInterval($0) } // Ignored
           serverTtlSeconds = ttlSeconds.map { TimeInterval($0) }
       }
     
@@ -87,10 +81,12 @@ public class ArtApps {
         return serverCooldownSeconds
     }
     
+    /*
     private func currentServerSessionGate(at now: Date) -> TimeInterval? {
         if checkTtl(at: now) { return nil }
         return serverSessionGateSeconds
     }
+    */
     
     /// Returns true if TTL has expired and resets server restrictions.
     private func checkTtl(at now: Date) -> Bool {
@@ -103,7 +99,7 @@ public class ArtApps {
         if now.timeIntervalSince(updatedAt) > ttlSeconds {
             print("[ArtApps] Server restrictions expired (TTL: \(ttlSeconds)s)")
             serverCooldownSeconds = nil
-            serverSessionGateSeconds = nil
+            // serverSessionGateSeconds = nil
             serverTtlSeconds = nil
             serverRestrictionsUpdatedAt = nil
             return true
