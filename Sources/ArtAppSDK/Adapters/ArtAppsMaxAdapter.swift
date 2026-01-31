@@ -147,6 +147,11 @@ class ArtAppsInterstitialAdapterDelegate: ArtAppsInterstitialDelegate {
         maxDelegate.didDisplayInterstitialAd()
     }
     
+    func artAppsInterstitial(_ ad: ArtAppsInterstitial, didFailToDisplay error: Error) {
+        print("[ArtAppsMaxAdapter] Delegate received: didFailToDisplay (\(error.localizedDescription)) 🤡")
+        maxDelegate.didFailToDisplayInterstitialAdWithError(MAAdapterError.adNotReady)
+    }
+    
     func artAppsInterstitialDidHide(_ ad: ArtAppsInterstitial) {
         print("[ArtAppsMaxAdapter] Delegate received: artAppsInterstitialDidHide 🤡")
         maxDelegate.didHideInterstitialAd()

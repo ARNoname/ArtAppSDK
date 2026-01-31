@@ -5,6 +5,7 @@ public protocol ArtAppsInterstitialDelegate: AnyObject {
     func artAppsInterstitialDidLoad(_ ad: ArtAppsInterstitial)
     func artAppsInterstitial(_ ad: ArtAppsInterstitial, didFailToLoad error: Error)
     func artAppsInterstitialDidDisplay(_ ad: ArtAppsInterstitial)
+    func artAppsInterstitial(_ ad: ArtAppsInterstitial, didFailToDisplay error: Error)
     func artAppsInterstitialDidHide(_ ad: ArtAppsInterstitial)
     func artAppsInterstitialDidClick(_ ad: ArtAppsInterstitial) // Optional depending on WebView interaction
 }
@@ -78,7 +79,7 @@ public class ArtAppsInterstitial: NSObject {
         if !ArtApps.shared.canShowAd() {
              print("[ArtApps] Show blocked by Session Gate/Freq Cap. Try again later.")
              let error = NSError(domain: "com.artApps.sdk", code: 304, userInfo: [NSLocalizedDescriptionKey: "Blocked by Session Gate/Freq Cap"])
-            delegate?.artAppsInterstitial(self, didFailToLoad: error)
+             delegate?.artAppsInterstitial(self, didFailToDisplay: error)
              return 
         }
 
