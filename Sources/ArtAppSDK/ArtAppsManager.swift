@@ -3,8 +3,8 @@ import AppLovinSDK
 import UIKit
 
 @MainActor
-public class ArtAppsManager: NSObject {
-    
+public class ArtAppsManager: NSObject, ObservableObject {
+  
     private var interstitialAd: MAInterstitialAd?
     private let adUnitId: String
     private let sdkKey: String
