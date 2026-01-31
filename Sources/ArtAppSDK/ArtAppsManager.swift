@@ -76,9 +76,15 @@ public class ArtAppsManager: NSObject {
             return
         }
         
-        // We can check our own rules locally if needed, but Adapter handles it too.
-        // It's safer to let the Adapter reject 'show' if session gate is active, 
-        // triggering didFail(toDisplay) -> retry loop.
+        // Check Session Gate / Freq Cap locally first!
+        // This prevents notifying AppLovin of a "failure" and keeps the ad ready.
+        if !ArtApps.shared.canShowAd() {
+            print("[ArtAppsManager] Show blocked by Session Gate/Freq Cap. Waiting 10s to retry...")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                self.show()
+            }
+            return
+        }
         
         if interstitialAd.isReady {
             interstitialAd.show()
